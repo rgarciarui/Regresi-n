@@ -1,0 +1,17 @@
+miAnova=function(modeloreg){
+SSq=unlist(anova(modeloreg)["Sum Sq"])
+DFq=unlist(anova(modeloreg)["Df"]) 
+k=length(SSq)-1 
+SSR=sum(SSq[1:k])
+SSE=SSq[(k+1)] 
+DF.SSR=sum(DFq[1:k]) 
+DF.SSE=DFq[(k+1)] 
+MSR=SSR/DF.SSR 
+MSE=SSE/DF.SSE 
+F0=MSR/MSE 
+VP=pf(F0,k,DF.SSE,lower.tail=F)
+result=data.frame(SumSq=c(SSR,SSE),Df=c(DF.SSR,DF.SSE),MeanSq=c(MSR,MSE),F0=c(round(F0,digits=3),' '), 
+P.value=c(format(VP,scientific = TRUE,digits=3),' '),row.names =c("Modelo","Error")) 
+cat("Tabla ANOVA Modelo de Regresión","\n") 
+result 
+}

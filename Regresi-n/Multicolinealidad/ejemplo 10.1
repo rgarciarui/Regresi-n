@@ -1,0 +1,36 @@
+require(MPV)
+conver <- c(49, 50.2, 50.5, 48.5, 47.5, 44.5, 28, 31.5, 34.5,35, 38, 38.5, 15, 17, 20.5, 29.5)
+temp <- c(1300, 1300,1300, 1300,1300, 1300, 1200,1200,1200,1200,1200,1200,1100,1100,1100,1100)
+relac <- c(7.5,9,11,13.5,17,23,5.3,7.5,11,13.5,17,23,5.3,7.5,11,17)
+tiempo <- c(0.0120,0.0120,0.0115,0.0130,0.0135,0.0120,0.04,0.038,0.032,0.026,0.034,0.041,0.084,0.098,0.092,0.086)
+datos <- data.frame(conver,temp,relac,tiempo)
+
+plot(x=temp, y=tiempo, type= "p",xlab ="Temperatura del reactor", 
+     ylab = "Tiempo de contacto")
+
+T <- c((temp-1212.50)/80.623)
+H <- c((relac-12.44)/5.662)     
+C <- c((tiempo-0.0403)/0.03164)
+P <- conver
+datosr <- data.frame(P,T,H,C)
+
+modelo <- lm(P~T+H+C+T*H+T*C+H*C+I(T^2)+I(H^2)+I(C^2))
+summary(modelo)
+
+
+require(car)
+miscoeficientes=function(modeloreg,datosreg){ 
+  coefi=coef(modeloreg) 
+  datos2=as.data.frame(scale(datosreg)) 
+  coef.std=c(0,coef(lm(update(formula(modeloreg),~.+0),datos2))) 
+  limites=confint(modeloreg,level=0.95) 
+  vifs=c(0,vif(modeloreg)) 
+  resul=data.frame(Estimación=coefi,Limites=limites,Vif=vifs,Coef.Std=coef.std) 
+  cat("Coeficientes estimados, sus I.C, Vifs y Coeficientes estimados estandarizados",
+      
+      "\n") 
+  resul 
+}
+
+miscoeficientes(modelo,datosr)
+cor(model.matrix(modelo))
